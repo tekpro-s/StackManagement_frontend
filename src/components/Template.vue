@@ -9,91 +9,61 @@
         <th></th>
         <th></th>
       </tr>
-      <template v-for="(value, index) in templates">
-        <tr :key="`first-${index}`">
-          <td v-if="active[index]">{{ value.item.name }}</td>
-          <td v-else>
-            <input type="text" v-model="templates[index].item.name" />
-          </td>
 
-          <td v-if="active[index]">{{ value.item.title1 }}</td>
-          <td v-else>
-            <input type="text" v-model="templates[index].item.title1" />
-          </td>
+      <!-- <template v-for="(value, index) in templates">
+        {{ templates[index].title }} -->
 
-          <td v-if="active[index]">{{ value.item.time1 }}分</td>
-          <td v-else>
-            <input type="text" v-model="templates[index].item.time1" />
-          </td>
+      <tr v-for="(value, index) in contents" :key="index">
+        <!-- <td :key="index">
+          {{ value.template_id }}
+        </td> -->
+        <td v-if="active[index]">
+          {{ name[index] }}
+        </td>
+        <td v-else>
+          <div v-if="name[index] != null">
+            <input type="text" v-model="name[index]" />
+          </div>
+        </td>
 
-          <td v-if="active[index]">{{ value.item.comment1 }}</td>
-          <td v-else>
-            <input type="text" v-model="templates[index].item.comment1" />
-          </td>
+        <td v-if="active[index]">
+          {{ value.title }}
+        </td>
+        <td v-else>
+          <input type="text" v-model="value.title" />
+        </td>
 
-          <!-- シェア変更 -->
-          <td>
-            <div @click="edit(index)">
-              <button>変更する</button>
-            </div>
-          </td>
-          <!-- シェア削除 -->
-          <td>
-            <img
-              class="icon"
-              src="../assets/cross.png"
-              @click="del(index)"
-              alt
-            />
-          </td>
-        </tr>
-        <tr :key="`second-${index}`">
-          <td></td>
+        <td v-if="active[index]">
+          {{ value.time }}
+        </td>
+        <td v-else>
+          <input type="text" v-model="value.time" />
+        </td>
 
-          <td v-if="active[index]">{{ value.item.title2 }}</td>
-          <td v-else>
-            <input type="text" v-model="templates[index].item.title2" />
-          </td>
+        <td v-if="active[index]">
+          {{ value.comment }}
+        </td>
+        <td v-else>
+          <input type="text" v-model="value.comment" />
+        </td>
 
-          <td v-if="active[index]">{{ value.item.time2 }}分</td>
-          <td v-else>
-            <input type="text" v-model="templates[index].item.time2" />
-          </td>
+        <td v-if="name[index]">
+          <div @click="edit(index, value.template_id)">
+            <button>変更する</button>
+          </div>
+          <div>
+            <button @click="doAdd(index)">+</button>
+            <button @click="doDel(index)">-</button>
+          </div>
+        </td>
 
-          <td v-if="active[index]">{{ value.item.comment2 }}</td>
-          <td v-else>
-            <input type="text" v-model="templates[index].item.comment2" />
-          </td>
-
-          <!-- シェア変更 -->
-          <td></td>
-          <!-- シェア削除 -->
-          <td></td>
-        </tr>
-        <tr :key="`third-${index}`">
-          <td></td>
-
-          <td v-if="active[index]">{{ value.item.title3 }}</td>
-          <td v-else>
-            <input type="text" v-model="templates[index].item.title3" />
-          </td>
-
-          <td v-if="active[index]">{{ value.item.time3 }}分</td>
-          <td v-else>
-            <input type="text" v-model="templates[index].item.time3" />
-          </td>
-
-          <td v-if="active[index]">{{ value.item.comment3 }}</td>
-          <td v-else>
-            <input type="text" v-model="templates[index].item.comment3" />
-          </td>
-
-          <!-- シェア変更 -->
-          <td></td>
-          <!-- シェア削除 -->
-          <td></td>
-        </tr>
-      </template>
+        <td>
+          <div v-if="name[index]" @click="del(value.template_id)">
+            <button>削除する</button>
+          </div>
+        </td>
+      </tr>
+      <!-- </template> -->
     </table>
   </div>
 </template>
@@ -106,98 +76,247 @@ export default {
     return {
       active: [],
       templates: [],
+      contents: [],
+      name: [],
+      template_id: null,
+      show_all: false,
+      api_url: null,
     };
   },
   methods: {
-    // 積み上げ更新
-    edit(index) {
-      if (!this.active[index]) {
-        console.log(this.active[index]);
-        console.log(
-          "http://localhost:10080/api/templates/" +
-            this.templates[index].item.id
-        );
-        axios
-          .put(
-            "http://localhost:10080/api/templates/" +
-              this.templates[index].item.id,
-            {
-              name: this.templates[index].item.name,
-              title1: this.templates[index].item.title1,
-              time1: this.templates[index].item.time1,
-              comment1: this.templates[index].item.comment1,
-              title2: this.templates[index].item.title2,
-              time2: this.templates[index].item.time2,
-              comment2: this.templates[index].item.comment2,
-              title3: this.templates[index].item.title3,
-              time3: this.templates[index].item.time3,
-              comment3: this.templates[index].item.comment3,
-            }
-          )
-          .then((response) => {
-            // this.$store.dispatch("changeUserData", {
-            //   profile: this.profile,
-            // });
-            console.log(response);
-          });
+    // テンプレート更新
+    edit(index, template_id) {
+      console.log("テンプレート更新：" + " " + this.contents[index]);
+
+      for (let i = 0; i < this.contents.length; i++) {
+        console.log(this.contents[i].template_id + " " + template_id);
+        if (this.contents[i].template_id == template_id) {
+          if (!this.active[i]) {
+            console.log(this.api_url + "contents/" + this.contents[i].id);
+
+            axios
+              .put(this.api_url + "contents/" + this.contents[i].id, {
+                title: this.contents[i].title,
+                time: this.contents[i].time,
+                comment: this.contents[i].comment,
+              })
+              .then((response) => {
+                this.$store.dispatch("changeUserData", {
+                  profile: this.profile,
+                });
+                console.log(response);
+              });
+          }
+
+          console.log(this.active[i] + " " + i);
+
+          // 配列の場合、setでないと再描画されない
+          this.$set(this.active, i, !this.active[i]);
+          console.log(this.active);
+          console.log(this.active[i] + " " + i);
+        }
       }
-      console.log(this.active[index] + " " + index);
-      //this.active[index] = !this.active[index];
-      this.$set(this.active, index, !this.active[index]);
-      console.log(this.active[index] + " " + index);
     },
-    // 積み上げ削除
-    del(index) {
-      // 自分のテンプレートだけ消せるようにする
-      if (this.templates[index].item.user_id == this.$store.state.user.id) {
+    // テンプレート取得
+    async getTemplates() {
+      let data_templates = [];
+      let data_contents = [];
+      let active = [];
+      let name = [];
+      //let template_id = null;
+      const templates = await axios.get(this.api_url + "templates");
+      const contents = await axios.get(this.api_url + "contents");
+
+      await Promise.all(
+        templates.data.data.map((d) => {
+          console.log(d);
+          // ログイン中ユーザのテンプレートのみ表示
+          console.log(d.user_id + " " + this.$store.state.user.id);
+          if (d.user_id == this.$store.state.user.id) {
+            data_templates.push(d);
+            active.push(true);
+          }
+        })
+      );
+
+      await Promise.all(
+        contents.data.data.map((d) => {
+          console.log(d);
+          // ログイン中ユーザのテンプレートの中身のみ表示
+          console.log(d.user_id + " " + this.$store.state.user.id);
+          if (d.user_id == this.$store.state.user.id) {
+            data_contents.push(d);
+            active.push(true);
+          }
+        })
+      );
+      this.templates = data_templates;
+      this.contents = data_contents;
+      this.active = active;
+
+      await Promise.all(
+        contents.data.data.map((d) => {
+          console.log(d);
+          // ログイン中ユーザのテンプレートの中身のみ表示
+          console.log(d.template_id + " " + d.id);
+          console.log();
+          // console.log(
+          //   "テンプレート名:" + " " + this.findTemplate(d.template_id, d.id)
+          // );
+          name.push(this.findTemplate(d.template_id, d.id));
+          console.log(name);
+        })
+      );
+
+      this.name = name;
+
+      console.log(this.templates);
+      console.log(this.active);
+      console.log(this.name);
+    },
+    // テンプレート名検索
+    findTemplate(template_id, content_id) {
+      let name = null;
+
+      // templates配列の値を全てループで確認
+      // 最初に引っかかったテンプレートIDの名前を返す
+      console.log(this.templates.length);
+      this.templates.find((template) => {
+        if (template.id == template_id) {
+          console.log(template.name);
+
+          // テンプレート名が確定
+          console.log(name);
+
+          let cnt = 0;
+          this.contents.find((content) => {
+            if (content.template_id == template_id) {
+              console.log(
+                content.template_id + " " + content.id + " " + content_id
+              );
+              if (content.id == content_id && cnt == 0) {
+                cnt++;
+                console.log("一致" + content.id + " " + content_id);
+                name = template.name;
+                console.log(name);
+              } else {
+                cnt++;
+                console.log(
+                  "間違い" + content.id + " " + content_id + " " + cnt
+                );
+                if (name == null) {
+                  name = null;
+                }
+                console.log(name);
+              }
+            }
+
+            // return template.id == template_id;
+          });
+
+          //break;
+        }
+      });
+
+      return name;
+    },
+    // テンプレート一行追加
+    doAdd(index) {
+      console.log("テンプレート更新：" + " " + this.contents[index]);
+      console.log(this.contents[index].id);
+      console.log(this.contents[index].user_id);
+
+      let cnt = 0;
+
+      // テンプレートIDが一致するcontentsの数を数える
+      for (let i = 0; i < this.contents.length; i++) {
+        if (this.contents[i].template_id == this.contents[index].template_id) {
+          cnt++;
+        }
+      }
+
+      console.log(cnt);
+
+      if (cnt < 3) {
         axios
-          .delete(
-            "http://localhost:10080/api/templates/" +
-              this.templates[index].item.id
-          )
-          .then((response) => {
-            console.log(response);
-            console.log(
-              this.templates[index].item.user_id +
-                " " +
-                this.$store.state.user.id
-            );
+          .post(this.api_url + "contents", {
+            template_id: this.contents[index].template_id,
+            user_id: this.contents[index].user_id,
+            title: "タイトル",
+            time: 0,
+            comment: "",
+          })
+          .then(() => {
             this.$router.go({
               path: this.$router.currentRoute.path,
               force: true,
             });
           });
-      } else {
-        alert("自分の積み上げではありません");
-        console.log(
-          this.templates[index].item.user_id + " " + this.$store.state.user.id
-        );
       }
     },
-    // テンプレート取得
-    async getTemplates() {
-      let data = [];
-      let active = [];
-      const templates = await axios.get("http://localhost:10080/api/templates");
+    // テンプレート一行削除
+    doDel(index) {
+      let cnt = 0;
 
-      await Promise.all(
-        templates.data.data.map((d) => {
-          axios
-            .get("http://localhost:10080/api/templates/" + d.id)
-            .then((response) => {
-              data.push(response.data);
-              active.push(true);
+      // テンプレートIDが一致するcontentsの数を数える
+      for (let i = 0; i < this.contents.length; i++) {
+        if (this.contents[i].template_id == this.contents[index].template_id) {
+          cnt++;
+        }
+      }
+
+      // テンプレートが2行以上なら、idが最も大きいテンプレートを削除
+      if (cnt > 1) {
+        // テンプレートid同じでid最大のものを探す
+        axios
+          .delete(this.api_url + "contents/" + this.contents[index].id)
+          .then(() => {
+            this.$router.go({
+              path: this.$router.currentRoute.path,
+              force: true,
             });
-        })
-      );
-      this.templates = data;
-      this.active = active;
-      console.log(this.templates);
-      console.log(this.active);
+          });
+      }
+    },
+
+    // 積み上げ削除
+    del(template_id) {
+      console.log(template_id);
+
+      // テンプレートIDが一致するcontentsの数を数える
+      for (let i = 0; i < this.contents.length; i++) {
+        if (this.contents[i].template_id == template_id) {
+          axios
+            .delete(this.api_url + "contents/" + this.contents[i].id)
+            .then((response) => {
+              console.log(response);
+            });
+        }
+      }
+
+      axios
+        .delete(this.api_url + "templates/" + template_id)
+        .then((response) => {
+          console.log(response);
+          this.$router.go({
+            path: this.$router.currentRoute.path,
+            force: true,
+          });
+        });
     },
   },
   // 画面表示時
   created() {
+    // 環境設定ファイルからURL取得
+    this.api_url = process.env.VUE_APP_API_BASE_URL;
+
+    // 現在のパスを取得
+    console.log(this.$route.path);
+
+    if (this.$route.path === "/profile") {
+      console.log(this.$route.path);
+      this.profile = true;
+    }
     this.getTemplates();
   },
 };

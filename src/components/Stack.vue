@@ -10,18 +10,18 @@
         <th></th>
       </tr>
       <tr v-for="(value, index) in stacks" :key="index">
-        <td v-if="active[index]">{{ value.item.date }}</td>
-        <td v-else><input type="text" v-model="stacks[index].item.date" /></td>
+        <td v-if="active[index]">{{ value.date }}</td>
+        <td v-else><input type="text" v-model="stacks[index].date" /></td>
 
-        <td v-if="active[index]">{{ value.item.title }}</td>
-        <td v-else><input type="text" v-model="stacks[index].item.title" /></td>
+        <td v-if="active[index]">{{ value.title }}</td>
+        <td v-else><input type="text" v-model="stacks[index].title" /></td>
 
-        <td v-if="active[index]">{{ value.item.time }}分</td>
-        <td v-else><input type="text" v-model="stacks[index].item.time" /></td>
+        <td v-if="active[index]">{{ value.time }}分</td>
+        <td v-else><input type="text" v-model="stacks[index].time" /></td>
 
-        <td v-if="active[index]">{{ value.item.comment }}</td>
+        <td v-if="active[index]">{{ value.comment }}</td>
         <td v-else>
-          <input type="text" v-model="stacks[index].item.comment" />
+          <input type="text" v-model="stacks[index].comment" />
         </td>
 
         <!-- シェア変更 -->
@@ -32,7 +32,9 @@
         </td>
         <!-- シェア削除 -->
         <td>
-          <img class="icon" src="../assets/cross.png" @click="del(index)" alt />
+          <div @click="del(index)">
+            <button>削除する</button>
+          </div>
         </td>
       </tr>
     </table>
@@ -42,11 +44,22 @@
 <script>
 import axios from "axios";
 export default {
-  props: ["id"],
+  props: {
+    id: Number,
+    show_all: Boolean,
+  },
+  // propsが変更された時にページ更新
+  watch: {
+    show_all: function (newHoge, oldHoge) {
+      console.log("hogeが" + oldHoge + "から" + newHoge + "に変更されました");
+      this.getStacks();
+    },
+  },
   data() {
     return {
       active: [],
       stacks: [],
+      api_url: null,
     };
   },
   methods: {
@@ -54,19 +67,14 @@ export default {
     edit(index) {
       if (!this.active[index]) {
         console.log(this.active[index]);
-        console.log(
-          "http://localhost:10080/api/stacks/" + this.stacks[index].item.id
-        );
+        console.log(this.api_url + "stacks/" + this.stacks[index].id);
         axios
-          .put(
-            "http://localhost:10080/api/stacks/" + this.stacks[index].item.id,
-            {
-              title: this.stacks[index].item.title,
-              time: this.stacks[index].item.time,
-              comment: this.stacks[index].item.comment,
-              date: this.stacks[index].item.date,
-            }
-          )
+          .put(this.api_url + "stacks/" + this.stacks[index].id, {
+            title: this.stacks[index].title,
+            time: this.stacks[index].time,
+            comment: this.stacks[index].comment,
+            date: this.stacks[index].date,
+          })
           .then((response) => {
             // this.$store.dispatch("changeUserData", {
             //   profile: this.profile,
@@ -82,25 +90,28 @@ export default {
     // 積み上げ削除
     del(index) {
       // 自分の積み上げだけ消せるようにする
-      if (this.stacks[index].item.user_id == this.$store.state.user.id) {
-        axios
-          .delete(
-            "http://localhost:10080/api/stacks/" + this.stacks[index].item.id
-          )
-          .then((response) => {
-            console.log(response);
-            console.log(
-              this.stacks[index].item.user_id + " " + this.$store.state.user.id
-            );
-            this.$router.go({
-              path: this.$router.currentRoute.path,
-              force: true,
+      if (this.stacks[index].user_id == this.$store.state.user.id) {
+        // 確認ダイアログ表示
+        var result = window.confirm("積み上げを削除しますか？");
+
+        if (result) {
+          axios
+            .delete(this.api_url + "stacks/" + this.stacks[index].id)
+            .then((response) => {
+              console.log(response);
+              console.log(
+                this.stacks[index].user_id + " " + this.$store.state.user.id
+              );
+              this.$router.go({
+                path: this.$router.currentRoute.path,
+                force: true,
+              });
             });
-          });
+        }
       } else {
         alert("自分の積み上げではありません");
         console.log(
-          this.stacks[index].item.user_id + " " + this.$store.state.user.id
+          this.stacks[index].user_id + " " + this.$store.state.user.id
         );
       }
     },
@@ -108,16 +119,42 @@ export default {
     async getStacks() {
       let data = [];
       let active = [];
-      const stacks = await axios.get("http://localhost:10080/api/stacks");
+      const stacks = await axios.get(this.api_url + "stacks");
 
       await Promise.all(
         stacks.data.data.map((d) => {
+          console.log(d);
+          // 全件表示ではない場合
+          if (!this.show_all) {
+            // ログイン中ユーザの積み上げのみ表示
+            if (d.user_id == this.$store.state.user.id) {
+              data.push(d);
+              active.push(true);
+            }
+            //全件表示
+          } else {
+            data.push(d);
+            active.push(true);
+          }
+          /*
           axios
             .get("http://localhost:10080/api/stacks/" + d.id)
             .then((response) => {
-              data.push(response.data);
-              active.push(true);
+              if (!this.show_all) {
+                console.log(
+                  response.data.item.user_id + " " + this.$store.state.user.id
+                );
+                // ログイン中ユーザのテンプレートのみ表示
+                if (response.data.item.user_id == this.$store.state.user.id) {
+                  data.push(response.data);
+                  active.push(true);
+                }
+              } else {
+                data.push(response.data);
+                active.push(true);
+              }
             });
+            */
         })
       );
       this.stacks = data;
@@ -128,6 +165,10 @@ export default {
   },
   // 画面表示時
   created() {
+    // 環境設定ファイルからURL取得
+    this.api_url = process.env.VUE_APP_API_BASE_URL;
+
+    // 積み上げ取得
     this.getStacks();
   },
 };

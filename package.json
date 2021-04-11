@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "local-serve": "vue-cli-service serve --mode local",
+    "local-build": "vue-cli-service build --mode local",
+    "prod-serve": "vue-cli-service serve --mode production",
+    "prod-build": "vue-cli-service build --mode production",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
@@ -13,6 +17,7 @@
     "moment": "^2.29.1",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
+    "vuejs-dialog": "^1.4.2",
     "vuex": "^3.6.2",
     "vuex-persistedstate": "^4.0.0-beta.3"
   },

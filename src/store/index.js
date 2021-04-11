@@ -29,7 +29,7 @@ export default new Vuex.Store({
   actions: {
     async login({ commit }, { email, password }) {
       const responseLogin = await axios.post(
-        "http://localhost:10080/api/login",
+        process.env.VUE_APP_API_BASE_URL + "login",
         //"https://fast-shore-97226.herokuapp.com/api/login",
         {
           email: email,
@@ -37,7 +37,7 @@ export default new Vuex.Store({
         }
       );
       const responseUser = await axios.get(
-        "http://localhost:10080/api/user",
+        process.env.VUE_APP_API_BASE_URL + "user",
         {
           params: {
             email: email,
@@ -51,7 +51,7 @@ export default new Vuex.Store({
     logout({ commit })
      {
       axios
-        .post("http://localhost:10080/api/logout", {
+        .post(process.env.VUE_APP_API_BASE_URL + "logout", {
         //.post("https://fast-shore-97226.herokuapp.com/api/logout", {
           auth: this.state.auth,
         })
@@ -67,5 +67,8 @@ export default new Vuex.Store({
     changeUserData({ commit }, { profile }) {
       commit("changeUserData", profile);
     },
+  },
+  mounted() {
+    this.api_url = process.env.VUE_APP_API_BASE_URL;
   },
 });

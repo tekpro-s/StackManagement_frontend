@@ -4,10 +4,23 @@
       <SideNavi />
     </div>
     <div class="right">
-      <div class="title">
+      <div class="title flex">
         <p>ホーム</p>
+        <div>
+          <label>
+            テンプレート選択
+            <select @change="updateValue" class="select">
+              <option value="false">自分の積み上げを表示</option>
+              <option value="true">全ての積み上げを表示</option>
+            </select>
+          </label>
+        </div>
+        <!-- <input type="radio" id="tab1" value="1" v-model="isActive" />
+        <label for="tab1">自分の積み上げを表示</label>
+        <input type="radio" id="tab2" value="2" v-model="isActive" />
+        <label for="tab2">全ての積み上げを表示</label> -->
       </div>
-      <Stack />
+      <Stack :show_all="show_all"></Stack>
     </div>
   </div>
 </template>
@@ -16,9 +29,21 @@
 import SideNavi from "../components/SideNavi";
 import Stack from "../components/Stack";
 export default {
+  data() {
+    return {
+      show_all: false,
+      projectName: null,
+      api_url: null,
+    };
+  },
   components: {
     SideNavi,
     Stack,
+  },
+  methods: {
+    updateValue() {
+      this.show_all = !this.show_all;
+    },
   },
 };
 </script>
@@ -111,5 +136,12 @@ button {
 .number {
   margin-left: 10px;
   margin-right: 10px;
+}
+.flex {
+  display: flex;
+  justify-content: space-between;
+}
+.select {
+  color: black;
 }
 </style>

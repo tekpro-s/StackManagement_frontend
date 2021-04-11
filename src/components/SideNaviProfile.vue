@@ -15,40 +15,16 @@
         <p>ログアウト</p>
       </div>
     </div>
-    <div v-if="profile">
-      <PostTemplate />
-    </div>
-    <div v-else>
-      <PostStack />
-    </div>
+    <PostTemplate />
   </div>
 </template>
 
 <script>
 import PostTemplate from "./PostTemplate";
-import PostStack from "./PostStack";
 
 export default {
   components: {
     PostTemplate,
-    PostStack,
-  },
-  data() {
-    return {
-      profile: false,
-    };
-  },
-  methods: {
-    // 画面表示時
-    beforeCreate() {
-      // 現在のパスを取得
-      // console.log(this.$route.path);
-
-      if (this.$route.path === "/profile") {
-        console.log(this.$route.path);
-        this.profile = true;
-      }
-    },
   },
 };
 </script>

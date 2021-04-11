@@ -24,6 +24,7 @@ export default {
       profile: "",
       email: "",
       password: "",
+      api_url: null,
     };
   },
   components: {
@@ -32,7 +33,7 @@ export default {
   methods: {
     auth() {
       axios
-        .post("http://localhost:10080/api/register", {
+        .post(this.api_url + "register", {
           name: this.name,
           profile: this.profile,
           email: this.email,
@@ -46,6 +47,9 @@ export default {
           alert(error);
         });
     },
+  },
+  mounted() {
+    this.api_url = process.env.VUE_APP_API_BASE_URL;
   },
 };
 </script>

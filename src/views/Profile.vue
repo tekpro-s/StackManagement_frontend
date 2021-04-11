@@ -1,7 +1,7 @@
 <template>
   <div class="flex">
     <div class="left">
-      <SideNavi />
+      <SideNaviProfile />
     </div>
     <div class="right">
       <div class="title">
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import SideNavi from "../components/SideNavi";
+import SideNaviProfile from "../components/SideNaviProfile";
 import Template from "../components/Template.vue";
 import axios from "axios";
 
@@ -34,6 +34,7 @@ export default {
       active: true,
       name: this.$store.state.user.name,
       profile: this.$store.state.user.profile,
+      api_url: null,
     };
   },
   methods: {
@@ -41,7 +42,7 @@ export default {
     edit() {
       if (!this.active) {
         axios
-          .put("/user", {
+          .put(this.api_url + "user", {
             email: this.$store.state.user.email,
             profile: this.profile,
           })
@@ -56,8 +57,11 @@ export default {
     },
   },
   components: {
-    SideNavi,
+    SideNaviProfile,
     Template,
+  },
+  mounted() {
+    this.api_url = process.env.VUE_APP_API_BASE_URL;
   },
 };
 </script>

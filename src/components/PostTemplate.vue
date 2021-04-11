@@ -1,15 +1,12 @@
 <template>
   <div>
-    <p>積み上げ</p>
+    <p>テンプレート</p>
     <div @click="openModal">
       <button>投稿する</button>
     </div>
     <div id="overlay" v-if="show">
       <div id="content">
         <div>
-          <label class="template_checkbox">
-            テンプレート登録<input type="checkbox" v-model="templateRegist" />
-          </label>
           <label>
             テンプレート選択
             <select
@@ -29,7 +26,6 @@
           </label>
         </div>
         <br />
-        <input class="date" placeholder="日付" v-model="date" />
         <div class="stack" v-for="(data, index) in form" :key="index">
           <input placeholder="タイトル" v-model="data.title" />
           <input placeholder="時間（分）" v-model="data.time" />
@@ -103,76 +99,51 @@ export default {
     send() {
       this.show = false;
       this.template_id = null;
-      for (let i = 0; i < this.form.length; i++) {
-        console.log(i);
-        console.log(this.form);
-        if (this.form[i].title === "") {
-          alert("積み上げ内容を入力してください");
-        } else if (this.form[i].time === "") {
-          alert("時間（分）を入力してください");
-        } else {
-          axios
-            .post(this.api_url + "stacks", {
-              user_id: this.$store.state.user.id,
-              title: this.form[i].title,
-              time: this.form[i].time,
-              comment: this.form[i].comment,
-              date: this.date,
-            })
-            .then(() => {
-              this.$router.go({
-                path: this.$router.currentRoute.path,
-                force: true,
-              });
-            });
-        }
-      }
+
       // テンプレート登録
-      console.log(this.templateRegist);
-      if (this.templateRegist) {
-        axios
-          .post(this.api_url + "templates", {
-            user_id: this.$store.state.user.id,
-            name: this.form[0].title,
-          })
-          .then((response) => {
-            // オートインクリメントしたテンプレートID取得
-            console.log(response);
-            console.log("template_response:" + response);
-            console.log("template_id:" + response.data.data_id);
-            this.template_id = response.data.data_id;
+      axios
+        .post(this.api_url + "templates", {
+          user_id: this.$store.state.user.id,
+          name: this.form[0].title,
+        })
+        .then((response) => {
+          // オートインクリメントしたテンプレートID取得
+          console.log(response);
+          console.log("template_response:" + response);
+          console.log("template_id:" + response);
 
-            // this.$router.go({
-            //   path: this.$router.currentRoute.path,
-            //   force: true,
-            // });
+          this.template_id = response.data.data_id;
 
-            for (let i = 0; i < this.form.length; i++) {
-              console.log(this.template_id);
-              console.log(this.$store.state.user.id);
-              console.log(this.form[i].title);
-              console.log(this.form[i].time);
-              console.log(this.form[i].comment);
-              axios
-                .post(this.api_url + "contents", {
-                  template_id: this.template_id,
-                  user_id: this.$store.state.user.id,
-                  title: this.form[i].title,
-                  time: this.form[i].time,
-                  comment: this.form[i].comment,
-                })
-                .then((response) => {
-                  console.log(response);
-                  console.log("template_response:" + response);
-                  console.log("template_id:" + response.data.template_id);
-                  // this.$router.go({
-                  //   path: this.$router.currentRoute.path,
-                  //   force: true,
-                  // });
+          // this.$router.go({
+          //   path: this.$router.currentRoute.path,
+          //   force: true,
+          // });
+
+          for (let i = 0; i < this.form.length; i++) {
+            console.log(this.template_id);
+            console.log(this.$store.state.user.id);
+            console.log(this.form[i].title);
+            console.log(this.form[i].time);
+            console.log(this.form[i].comment);
+            axios
+              .post(this.api_url + "contents", {
+                template_id: this.template_id,
+                user_id: this.$store.state.user.id,
+                title: this.form[i].title,
+                time: this.form[i].time,
+                comment: this.form[i].comment,
+              })
+              .then((response) => {
+                console.log(response);
+                console.log("template_response:" + response);
+                console.log("template_id:" + response.data.template_id);
+                this.$router.go({
+                  path: this.$router.currentRoute.path,
+                  force: true,
                 });
-            }
-          });
-      }
+              });
+          }
+        });
     },
     // 現在日取得
     nowDate() {
