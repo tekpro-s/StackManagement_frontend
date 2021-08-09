@@ -1,11 +1,13 @@
 <template>
   <div class="flex">
+    <!-- <button v-on:click="doClick">Show!</button> -->
     <div class="left">
       <SideNavi />
     </div>
     <div class="right">
       <div class="title flex">
         <p>ホーム</p>
+        <p>{{ msg }}</p>
         <div>
           <label>
             テンプレート選択
@@ -34,6 +36,7 @@ export default {
       show_all: false,
       projectName: null,
       api_url: null,
+      path: null,
     };
   },
   components: {
@@ -41,9 +44,37 @@ export default {
     Stack,
   },
   methods: {
+    doClick() {
+      var options = {
+        position: "top-right",
+        duration: 2000,
+        fullWidth: true,
+        type: "success",
+      };
+
+      this.$toasted.show("テスト成功！", options);
+    },
     updateValue() {
       this.show_all = !this.show_all;
     },
+  },
+
+  beforeRouteEnter(to, from, next) {
+    console.log(from.path);
+    //window.confirm(from.path);
+    //this.path = from.path;
+    next();
+  },
+  // 画面表示時
+  created() {
+    var options = {
+      position: "top-right",
+      duration: 2000,
+      fullWidth: true,
+      type: "success",
+    };
+
+    this.$toasted.show(this.path, options);
   },
 };
 </script>
@@ -60,15 +91,21 @@ export default {
 .flex {
   display: flex;
 }
+.flex {
+  display: flex;
+  justify-content: space-between;
+}
+
 .title {
-  border-bottom: 1px solid white;
-  border-left: 1px solid white;
+  border-bottom: 1px solid black;
+  border-left: 1px solid black;
   padding: 15px;
 }
 .title p {
   font-size: 20px;
   font-weight: bold;
 }
+/*
 .left-padding {
   margin: 20px;
 }
@@ -83,6 +120,7 @@ export default {
   font-size: 16px;
   padding-left: 15px;
 }
+
 .share {
   margin: 15px;
 }
@@ -92,16 +130,16 @@ export default {
   margin-top: 15px;
   margin-bottom: 15px;
   border-radius: 10px;
-  border: 1px solid white;
+  border: 1px solid black;
   background-color: #15202b;
-  color: white;
+  color: black;
   resize: none;
 }
 button {
   width: 100px;
   text-align: center;
   padding: 8px 0 10px;
-  color: #fff;
+  color: #000;
   background-color: #5419da;
   border-radius: 25px;
   display: block;
@@ -111,7 +149,7 @@ button {
   text-align: center;
   margin-top: 20px;
   padding-bottom: 10px;
-  border-bottom: 1px solid white;
+  border-bottom: 1px solid black;
 }
 .icon {
   width: 25px;
@@ -122,8 +160,8 @@ button {
 }
 .message {
   padding: 20px;
-  border-bottom: solid 1px white;
-  border-left: solid 1px white;
+  border-bottom: solid 1px black;
+  border-left: solid 1px black;
 }
 .name {
   font-size: 18px;
@@ -137,11 +175,8 @@ button {
   margin-left: 10px;
   margin-right: 10px;
 }
-.flex {
-  display: flex;
-  justify-content: space-between;
-}
+
 .select {
   color: black;
-}
+} */
 </style>

@@ -80,15 +80,15 @@ export default {
 }
 .profile {
   padding: 20px;
-  border-bottom: solid 1px white;
-  border-left: 1px solid white;
+  border-bottom: solid 1px black;
+  border-left: 1px solid black;
 }
 .profile-name {
   font-size: 24px;
 }
 .title {
-  border-bottom: 1px solid white;
-  border-left: 1px solid white;
+  border-bottom: 1px solid black;
+  border-left: 1px solid black;
   padding: 15px;
 }
 .title p {

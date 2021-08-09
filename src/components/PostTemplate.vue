@@ -1,8 +1,10 @@
 <template>
   <div>
-    <p>テンプレート</p>
-    <div @click="openModal">
-      <button>投稿する</button>
+    <div class="left-padding border">
+      <p>テンプレート</p>
+      <div @click="openModal">
+        <button>投稿する</button>
+      </div>
     </div>
     <div id="overlay" v-if="show">
       <div id="content">
@@ -227,6 +229,10 @@ export default {
 </script>
 
 <style scoped>
+.left-padding {
+  margin: 20px;
+}
+
 .stack {
   margin: 5px;
 }
@@ -240,6 +246,7 @@ export default {
   border-radius: 10px;
   width: 30%;
   height: 30px;
+  color: white;
 }
 
 .stack input {
@@ -255,14 +262,14 @@ export default {
   color: white;
 }
 .template_checkbox {
-  color: black;
+  color: white;
 }
 .template_checkbox input {
   width: 20px;
   height: 20px;
 }
 .template_select {
-  color: black;
+  color: white;
   width: 20%;
   height: 30px;
 }

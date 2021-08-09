@@ -1,8 +1,10 @@
 <template>
   <div>
-    <p>積み上げ</p>
-    <div @click="openModal">
-      <button>投稿する</button>
+    <div class="left-padding border">
+      <p>積み上げ</p>
+      <div @click="openModal">
+        <button>投稿する</button>
+      </div>
     </div>
     <div id="overlay" v-if="show">
       <div id="content">
@@ -49,6 +51,11 @@
 import axios from "axios";
 import moment from "moment";
 export default {
+  beforeRouteUpdate(to, from, next) {
+    next();
+    this.getTemplates();
+    //this.hoge() // 表示用のデータを更新する処理
+  },
   data() {
     return {
       date: this.nowDate(),
@@ -78,6 +85,9 @@ export default {
     },
   },
   methods: {
+    handler(event) {
+      event.returnValue = "Data you've inputted won't be synced";
+    },
     // フォームを追加する（３つまで）
     doAdd() {
       if (this.form.length < 3) {
@@ -101,15 +111,22 @@ export default {
       this.show = false;
     },
     send() {
+      var options = {
+        position: "top-right",
+        duration: 2000,
+        fullWidth: true,
+        type: "error",
+      };
+
       this.show = false;
       this.template_id = null;
       for (let i = 0; i < this.form.length; i++) {
         console.log(i);
         console.log(this.form);
         if (this.form[i].title === "") {
-          alert("積み上げ内容を入力してください");
+          this.$toasted.show("積み上げ内容を入力してください", options);
         } else if (this.form[i].time === "") {
-          alert("時間（分）を入力してください");
+          this.$toasted.show("時間（分）を入力してください", options);
         } else {
           axios
             .post(this.api_url + "stacks", {
@@ -120,10 +137,20 @@ export default {
               date: this.date,
             })
             .then(() => {
+              //alert("積み上げを投稿しました");
+
               this.$router.go({
                 path: this.$router.currentRoute.path,
                 force: true,
               });
+
+              // this.$router.push({ path: this.$router.currentRoute.path });
+              // this.$router.push({
+              //   path: this.$router.currentRoute.path,
+              //   // force: true,
+              //   // params: { msg: "積み上げを投稿しました" },
+              // });
+              //this.$router.push({ name: "Home" });
             });
         }
       }
@@ -165,10 +192,6 @@ export default {
                   console.log(response);
                   console.log("template_response:" + response);
                   console.log("template_id:" + response.data.template_id);
-                  // this.$router.go({
-                  //   path: this.$router.currentRoute.path,
-                  //   force: true,
-                  // });
                 });
             }
           });
@@ -249,13 +272,17 @@ export default {
     // 環境設定ファイルからURL取得
     this.api_url = process.env.VUE_APP_API_BASE_URL;
 
-    // 積み上げ取得
+    // テンプレート名取得
     this.getTemplates();
   },
 };
 </script>
 
 <style scoped>
+.left-padding {
+  margin: 20px;
+}
+
 .stack {
   margin: 5px;
 }
@@ -269,6 +296,7 @@ export default {
   border-radius: 10px;
   width: 30%;
   height: 30px;
+  color: white;
 }
 
 .stack input {

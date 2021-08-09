@@ -1,17 +1,16 @@
 <template>
   <div>
-    <div class="left-padding">
-      <img class="logo" src="../assets/logo.png" />
+    <div class="left-padding border">
       <div class="flex icon-field" @click="$router.push('/home')">
-        <img class="icon" src="../assets/home.png" />
+        <font-awesome-icon icon="home" />
         <p>ホーム</p>
       </div>
       <div class="flex icon-field" @click="$router.push('/profile')">
-        <img class="icon" src="../assets/profile.png" />
+        <font-awesome-icon icon="user" />
         <p>プロフィール</p>
       </div>
       <div class="flex icon-field" @click="$store.dispatch('logout')">
-        <img class="icon" src="../assets/logout.png" />
+        <font-awesome-icon icon="sign-out-alt" />
         <p>ログアウト</p>
       </div>
     </div>

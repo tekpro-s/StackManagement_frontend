@@ -1,42 +1,52 @@
 <template>
   <div>
-    <table border="1">
-      <tr>
-        <th>日付</th>
-        <th>タイトル</th>
-        <th>時間（分）</th>
-        <th>備考</th>
-        <th></th>
-        <th></th>
-      </tr>
-      <tr v-for="(value, index) in stacks" :key="index">
-        <td v-if="active[index]">{{ value.date }}</td>
-        <td v-else><input type="text" v-model="stacks[index].date" /></td>
+    <div id="app">
+    </div>
+    <p>{{ msg }}</p>
+    <table
+      border="1"
+      class="table table-sm table-bordered table-striped table-hover"
+    >
+      <thead>
+        <tr>
+          <th>日付</th>
+          <th>タイトル</th>
+          <th>時間（分）</th>
+          <th>備考</th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(value, index) in stacks" :key="index">
+          <td v-if="active[index]">{{ value.date }}</td>
+          <td v-else><input type="text" v-model="stacks[index].date" /></td>
 
-        <td v-if="active[index]">{{ value.title }}</td>
-        <td v-else><input type="text" v-model="stacks[index].title" /></td>
+          <td v-if="active[index]">{{ value.title }}</td>
+          <td v-else><input type="text" v-model="stacks[index].title" /></td>
 
-        <td v-if="active[index]">{{ value.time }}分</td>
-        <td v-else><input type="text" v-model="stacks[index].time" /></td>
+          <td v-if="active[index]">{{ value.time }}分</td>
+          <td v-else><input type="text" v-model="stacks[index].time" /></td>
 
-        <td v-if="active[index]">{{ value.comment }}</td>
-        <td v-else>
-          <input type="text" v-model="stacks[index].comment" />
-        </td>
+          <td v-if="active[index]">{{ value.comment }}</td>
+          <td v-else>
+            <input type="text" v-model="stacks[index].comment" />
+          </td>
 
-        <!-- シェア変更 -->
-        <td>
-          <div @click="edit(index)">
-            <button>変更する</button>
-          </div>
-        </td>
-        <!-- シェア削除 -->
-        <td>
-          <div @click="del(index)">
-            <button>削除する</button>
-          </div>
-        </td>
-      </tr>
+          <!-- シェア変更 -->
+          <td>
+            <div @click="edit(index)">
+              <button class="btn btn-sm btn-success">変更する</button>
+            </div>
+          </td>
+          <!-- シェア削除 -->
+          <td>
+            <div @click="del(index)">
+              <button class="btn btn-sm btn-danger">削除する</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </div>
 </template>
@@ -175,7 +185,7 @@ export default {
 </script>
 
 <style scoped>
-.flex {
+/* .flex {
   display: flex;
 }
 .icon {
@@ -187,8 +197,8 @@ export default {
 }
 .message {
   padding: 20px;
-  border-bottom: solid 1px white;
-  border-left: solid 1px white;
+  border-bottom: solid 1px black;
+  border-left: solid 1px black;
 }
 .name {
   font-size: 18px;
@@ -201,20 +211,20 @@ export default {
 .number {
   margin-left: 10px;
   margin-right: 10px;
-}
-table {
+} */
+/* table {
   width: 100%;
-  border: solid 1px #fff;
+  border: solid 1px #000;
   border-collapse: collapse;
 }
 
 table th {
   position: relative;
   text-align: left;
-  border: solid 1px #fff;
+  border: solid 1px #000;
   padding: 10px;
   width: 10%;
-}
+} */
 
 /* table th:after {
   display: block;
@@ -224,24 +234,24 @@ table th {
   right: 20px;
 } */
 
-table td {
+/* table td {
   text-align: left;
   padding: 10px;
   width: 10%;
-  border: solid 1px #fff;
+  border: solid 1px #000;
   border-collapse: collapse;
 }
 
 table td:nth-last-child(1),
 table td:nth-last-child(2) {
   width: 0px;
-}
-
+} */
+/* 
 input {
   color: black;
 }
 
 button {
   color: black;
-}
+} */
 </style>

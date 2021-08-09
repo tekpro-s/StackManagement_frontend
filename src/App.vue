@@ -172,10 +172,10 @@ select {
 }
 
 html {
-  background-color: #15202b;
+  background-color: white;
 }
 * {
-  color: white;
+  color: black;
   font-family: "Noto Sans JP";
 }
 </style>

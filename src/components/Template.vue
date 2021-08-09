@@ -1,68 +1,73 @@
 <template>
   <div>
-    <table border="1">
-      <tr>
-        <th>テンプレート名</th>
-        <th>タイトル</th>
-        <th>時間（分）</th>
-        <th>備考</th>
-        <th></th>
-        <th></th>
-      </tr>
-
+    <table
+      border="1"
+      class="table table-sm table-bordered table-striped table-hover"
+    >
+      <thead>
+        <tr>
+          <th>テンプレート名</th>
+          <th>タイトル</th>
+          <th>時間（分）</th>
+          <th>備考</th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
       <!-- <template v-for="(value, index) in templates">
         {{ templates[index].title }} -->
-
-      <tr v-for="(value, index) in contents" :key="index">
-        <!-- <td :key="index">
+      <tbody>
+        <tr v-for="(value, index) in contents" :key="index">
+          <!-- <td :key="index">
           {{ value.template_id }}
         </td> -->
-        <td v-if="active[index]">
-          {{ name[index] }}
-        </td>
-        <td v-else>
-          <div v-if="name[index] != null">
-            <input type="text" v-model="name[index]" />
-          </div>
-        </td>
+          <td v-if="active[index]">
+            {{ name[index] }}
+          </td>
+          <td v-else>
+            <div v-if="name[index] != null">
+              <input type="text" v-model="name[index]" />
+            </div>
+          </td>
 
-        <td v-if="active[index]">
-          {{ value.title }}
-        </td>
-        <td v-else>
-          <input type="text" v-model="value.title" />
-        </td>
+          <td v-if="active[index]">
+            {{ value.title }}
+          </td>
+          <td v-else>
+            <input type="text" v-model="value.title" />
+          </td>
 
-        <td v-if="active[index]">
-          {{ value.time }}
-        </td>
-        <td v-else>
-          <input type="text" v-model="value.time" />
-        </td>
+          <td v-if="active[index]">
+            {{ value.time }}
+          </td>
+          <td v-else>
+            <input type="text" v-model="value.time" />
+          </td>
 
-        <td v-if="active[index]">
-          {{ value.comment }}
-        </td>
-        <td v-else>
-          <input type="text" v-model="value.comment" />
-        </td>
+          <td v-if="active[index]">
+            {{ value.comment }}
+          </td>
+          <td v-else>
+            <input type="text" v-model="value.comment" />
+          </td>
 
-        <td v-if="name[index]">
-          <div @click="edit(index, value.template_id)">
-            <button>変更する</button>
-          </div>
-          <div>
-            <button @click="doAdd(index)">+</button>
-            <button @click="doDel(index)">-</button>
-          </div>
-        </td>
+          <td v-if="name[index]">
+            <div @click="edit(index, value.template_id)">
+              <button class="btn btn-sm btn-success">変更する</button>
+            </div>
+            <div>
+              <button @click="doAdd(index)" class="btn btn-primary">+</button>
+              <button @click="doDel(index)" class="btn btn-primary">-</button>
+            </div>
+          </td>
 
-        <td>
-          <div v-if="name[index]" @click="del(value.template_id)">
-            <button>削除する</button>
-          </div>
-        </td>
-      </tr>
+          <td>
+            <div v-if="name[index]" @click="del(value.template_id)">
+              <button class="btn btn-sm btn-danger">削除する</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
       <!-- </template> -->
     </table>
   </div>
@@ -319,11 +324,14 @@ export default {
     }
     this.getTemplates();
   },
+  destroyed() {
+    window.removeEventListener("beforeunload", this.handler);
+  },
 };
 </script>
 
 <style scoped>
-.flex {
+/* .flex {
   display: flex;
 }
 .icon {
@@ -352,31 +360,31 @@ export default {
 }
 table {
   width: 100%;
-  border: solid 1px #fff;
+  border: solid 1px #000;
   border-collapse: collapse;
 }
 
 table th {
   position: relative;
   text-align: left;
-  border: solid 1px #fff;
+  border: solid 1px #000;
   padding: 10px;
   width: 10%;
 }
 
-/* table th:after {
+table th:after {
   display: block;
   content: "";
   width: 30px;
   height: 2px;
   right: 20px;
-} */
+}
 
 table td {
   text-align: left;
   padding: 10px;
   width: 10%;
-  border: solid 1px #fff;
+  border: solid 1px #000;
   border-collapse: collapse;
 }
 
@@ -391,5 +399,5 @@ input {
 
 button {
   color: black;
-}
+} */
 </style>
