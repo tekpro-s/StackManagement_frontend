@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div id="app">
-    </div>
-    <p>{{ msg }}</p>
+    <div id="app"></div>
     <table
       border="1"
       class="table table-sm table-bordered table-striped table-hover"
@@ -57,18 +55,11 @@ export default {
   props: {
     id: Number,
     show_all: Boolean,
-  },
-  // propsが変更された時にページ更新
-  watch: {
-    show_all: function (newHoge, oldHoge) {
-      console.log("hogeが" + oldHoge + "から" + newHoge + "に変更されました");
-      this.getStacks();
-    },
+    stacks: Array,
+    active: Array,
   },
   data() {
     return {
-      active: [],
-      stacks: [],
       api_url: null,
     };
   },
@@ -112,11 +103,9 @@ export default {
               console.log(
                 this.stacks[index].user_id + " " + this.$store.state.user.id
               );
-              this.$router.go({
-                path: this.$router.currentRoute.path,
-                force: true,
-              });
             });
+          this.stacks.splice(index, 1);
+          this.active.splice(index, 1);
         }
       } else {
         alert("自分の積み上げではありません");
@@ -125,61 +114,11 @@ export default {
         );
       }
     },
-    // 積み上げ取得
-    async getStacks() {
-      let data = [];
-      let active = [];
-      const stacks = await axios.get(this.api_url + "stacks");
-
-      await Promise.all(
-        stacks.data.data.map((d) => {
-          console.log(d);
-          // 全件表示ではない場合
-          if (!this.show_all) {
-            // ログイン中ユーザの積み上げのみ表示
-            if (d.user_id == this.$store.state.user.id) {
-              data.push(d);
-              active.push(true);
-            }
-            //全件表示
-          } else {
-            data.push(d);
-            active.push(true);
-          }
-          /*
-          axios
-            .get("http://localhost:10080/api/stacks/" + d.id)
-            .then((response) => {
-              if (!this.show_all) {
-                console.log(
-                  response.data.item.user_id + " " + this.$store.state.user.id
-                );
-                // ログイン中ユーザのテンプレートのみ表示
-                if (response.data.item.user_id == this.$store.state.user.id) {
-                  data.push(response.data);
-                  active.push(true);
-                }
-              } else {
-                data.push(response.data);
-                active.push(true);
-              }
-            });
-            */
-        })
-      );
-      this.stacks = data;
-      this.active = active;
-      console.log(this.stacks);
-      console.log(this.active);
-    },
   },
   // 画面表示時
   created() {
     // 環境設定ファイルからURL取得
     this.api_url = process.env.VUE_APP_API_BASE_URL;
-
-    // 積み上げ取得
-    this.getStacks();
   },
 };
 </script>

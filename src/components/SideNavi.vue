@@ -18,7 +18,10 @@
       <PostTemplate />
     </div>
     <div v-else>
-      <PostStack />
+      <PostStack
+        :stacks="stacks"
+        :active="active"
+      />
     </div>
   </div>
 </template>
@@ -28,6 +31,10 @@ import PostTemplate from "./PostTemplate";
 import PostStack from "./PostStack";
 
 export default {
+  props: {
+    stacks: Array,
+    active: Array,
+  },
   components: {
     PostTemplate,
     PostStack,
@@ -35,6 +42,7 @@ export default {
   data() {
     return {
       profile: false,
+      stack: "",
     };
   },
   methods: {

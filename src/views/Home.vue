@@ -1,28 +1,14 @@
 <template>
   <div class="flex">
-    <!-- <button v-on:click="doClick">Show!</button> -->
+    {{ stack }}
     <div class="left">
-      <SideNavi />
+      <SideNavi :stacks="stacks" :active="active" />
     </div>
     <div class="right">
       <div class="title flex">
         <p>ホーム</p>
-        <p>{{ msg }}</p>
-        <div>
-          <label>
-            テンプレート選択
-            <select @change="updateValue" class="select">
-              <option value="false">自分の積み上げを表示</option>
-              <option value="true">全ての積み上げを表示</option>
-            </select>
-          </label>
-        </div>
-        <!-- <input type="radio" id="tab1" value="1" v-model="isActive" />
-        <label for="tab1">自分の積み上げを表示</label>
-        <input type="radio" id="tab2" value="2" v-model="isActive" />
-        <label for="tab2">全ての積み上げを表示</label> -->
       </div>
-      <Stack :show_all="show_all"></Stack>
+      <Stack :show_all="show_all" :stacks="stacks" :active="active"></Stack>
     </div>
   </div>
 </template>
@@ -30,6 +16,7 @@
 <script>
 import SideNavi from "../components/SideNavi";
 import Stack from "../components/Stack";
+import axios from "axios";
 export default {
   data() {
     return {
@@ -37,6 +24,9 @@ export default {
       projectName: null,
       api_url: null,
       path: null,
+      stacks: [],
+      active: [],
+      stack: "",
     };
   },
   components: {
@@ -54,27 +44,67 @@ export default {
 
       this.$toasted.show("テスト成功！", options);
     },
-    updateValue() {
-      this.show_all = !this.show_all;
-    },
-  },
+    // 積み上げ取得
+    async getStacks() {
+      let data = [];
+      let active = [];
+      const stacks = await axios.get(this.api_url + "stacks");
 
-  beforeRouteEnter(to, from, next) {
-    console.log(from.path);
-    //window.confirm(from.path);
-    //this.path = from.path;
-    next();
+      console.log(this.api_url + "stacks");
+
+      await Promise.all(
+        stacks.data.data.map((d) => {
+          console.log(d);
+          // 全件表示ではない場合
+          if (!this.show_all) {
+            // ログイン中ユーザの積み上げのみ表示
+            if (d.user_id == this.$store.state.user.id) {
+              data.push(d);
+              active.push(true);
+            }
+            //全件表示
+          } else {
+            data.push(d);
+            active.push(true);
+          }
+          /*
+          axios
+            .get("http://localhost:10080/api/stacks/" + d.id)
+            .then((response) => {
+              if (!this.show_all) {
+                console.log(
+                  response.data.item.user_id + " " + this.$store.state.user.id
+                );
+                // ログイン中ユーザのテンプレートのみ表示
+                if (response.data.item.user_id == this.$store.state.user.id) {
+                  data.push(response.data);
+                  active.push(true);
+                }
+              } else {
+                data.push(response.data);
+                active.push(true);
+              }
+            });
+            */
+        })
+      );
+      this.stacks = data;
+      this.active = active;
+      console.log(this.stacks);
+      console.log(this.active);
+    },
   },
   // 画面表示時
   created() {
-    var options = {
-      position: "top-right",
-      duration: 2000,
-      fullWidth: true,
-      type: "success",
-    };
+    // 環境設定ファイルからURL取得
+    this.api_url = process.env.VUE_APP_API_BASE_URL;
 
-    this.$toasted.show(this.path, options);
+    console.log(this.api_url + "stacks");
+    // 積み上げ取得
+    this.getStacks();
+  },
+  updateValue() {
+    this.show_all = !this.show_all;
   },
 };
 </script>

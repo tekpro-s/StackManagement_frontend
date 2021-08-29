@@ -56,6 +56,10 @@ export default {
     this.getTemplates();
     //this.hoge() // 表示用のデータを更新する処理
   },
+  props: {
+    stacks: Array,
+    active: Array,
+  },
   data() {
     return {
       date: this.nowDate(),
@@ -110,7 +114,7 @@ export default {
     closeModal() {
       this.show = false;
     },
-    send() {
+    async send() {
       var options = {
         position: "top-right",
         duration: 2000,
@@ -128,32 +132,37 @@ export default {
         } else if (this.form[i].time === "") {
           this.$toasted.show("時間（分）を入力してください", options);
         } else {
-          axios
-            .post(this.api_url + "stacks", {
-              user_id: this.$store.state.user.id,
-              title: this.form[i].title,
-              time: this.form[i].time,
-              comment: this.form[i].comment,
-              date: this.date,
-            })
-            .then(() => {
-              //alert("積み上げを投稿しました");
-
-              this.$router.go({
-                path: this.$router.currentRoute.path,
-                force: true,
-              });
-
-              // this.$router.push({ path: this.$router.currentRoute.path });
-              // this.$router.push({
-              //   path: this.$router.currentRoute.path,
-              //   // force: true,
-              //   // params: { msg: "積み上げを投稿しました" },
-              // });
-              //this.$router.push({ name: "Home" });
-            });
+          // const a = axios
+          //   .post(this.api_url + "stacks", {
+          //     user_id: this.$store.state.user.id,
+          //     title: this.form[i].title,
+          //     time: this.form[i].time,
+          //     comment: this.form[i].comment,
+          //     date: this.date,
+          //   })
+          //   .then(() => {
+          //     this.$emit("getChildStack", {
+          //       user_id: this.$store.state.user.id,
+          //       title: this.form[i].title,
+          //       time: this.form[i].time,
+          //       comment: this.form[i].comment,
+          //       date: this.date,
+          //     });
+          //   });
+          const stack = await axios.post(this.api_url + "stacks", {
+            user_id: this.$store.state.user.id,
+            title: this.form[i].title,
+            time: this.form[i].time,
+            comment: this.form[i].comment,
+            date: this.date,
+          });
+          console.log(stack.data.data);
+          this.stacks.unshift(stack.data.data);
+          this.active.unshift(true);
+          //this.$emit("getChildStack", stack.data.data);
         }
       }
+
       // テンプレート登録
       console.log(this.templateRegist);
       if (this.templateRegist) {
@@ -200,13 +209,10 @@ export default {
     // 現在日取得
     nowDate() {
       var today = new Date();
-      today =
-        today.getFullYear() +
-        "-" +
-        (today.getMonth() + 1) +
-        "-" +
-        today.getDate();
-      return today;
+      var y = today.getFullYear();
+      var m = ("00" + (today.getMonth() + 1)).slice(-2);
+      var d = ("00" + today.getDate()).slice(-2);
+      return y + "-" + m + "-" + d;
     },
     // 選択したテンプレートから値を取得
     async updateValue() {
