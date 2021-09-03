@@ -14,7 +14,12 @@
         <p>ログアウト</p>
       </div>
     </div>
-    <PostTemplate />
+    <PostTemplate
+      :templates="templates"
+      :templates_active="templates_active"
+      :contents="contents"
+      :templates_name="templates_name"
+    />
   </div>
 </template>
 
@@ -22,6 +27,12 @@
 import PostTemplate from "./PostTemplate";
 
 export default {
+  props: {
+    templates: Array,
+    templates_active: Array,
+    contents: Array,
+    templates_name: Array,
+  },
   components: {
     PostTemplate,
   },

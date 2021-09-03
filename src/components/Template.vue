@@ -21,37 +21,37 @@
           <!-- <td :key="index">
           {{ value.template_id }}
         </td> -->
-          <td v-if="active[index]">
-            {{ name[index] }}
+          <td v-if="templates_active[index]">
+            {{ templates_name[index] }}
           </td>
           <td v-else>
-            <div v-if="name[index] != null">
-              <input type="text" v-model="name[index]" />
+            <div v-if="templates_name[index] != null">
+              <input type="text" v-model="templates_name[index]" />
             </div>
           </td>
 
-          <td v-if="active[index]">
+          <td v-if="templates_active[index]">
             {{ value.title }}
           </td>
           <td v-else>
             <input type="text" v-model="value.title" />
           </td>
 
-          <td v-if="active[index]">
+          <td v-if="templates_active[index]">
             {{ value.time }}
           </td>
           <td v-else>
             <input type="text" v-model="value.time" />
           </td>
 
-          <td v-if="active[index]">
+          <td v-if="templates_active[index]">
             {{ value.comment }}
           </td>
           <td v-else>
             <input type="text" v-model="value.comment" />
           </td>
 
-          <td v-if="name[index]">
+          <td v-if="templates_name[index]">
             <div @click="edit(index, value.template_id)">
               <button class="btn btn-sm btn-success">変更する</button>
             </div>
@@ -62,7 +62,7 @@
           </td>
 
           <td>
-            <div v-if="name[index]" @click="del(value.template_id)">
+            <div v-if="templates_name[index]" @click="del(value.template_id)">
               <button class="btn btn-sm btn-danger">削除する</button>
             </div>
           </td>
@@ -76,13 +76,15 @@
 <script>
 import axios from "axios";
 export default {
-  props: ["id"],
+  props: {
+    id: Number,
+    templates: Array,
+    templates_active: Array,
+    contents: Array,
+    templates_name: Array,
+  },
   data() {
     return {
-      active: [],
-      templates: [],
-      contents: [],
-      name: [],
       template_id: null,
       show_all: false,
       api_url: null,
@@ -96,7 +98,7 @@ export default {
       for (let i = 0; i < this.contents.length; i++) {
         console.log(this.contents[i].template_id + " " + template_id);
         if (this.contents[i].template_id == template_id) {
-          if (!this.active[i]) {
+          if (!this.templates_active[i]) {
             console.log(this.api_url + "contents/" + this.contents[i].id);
 
             axios
@@ -113,118 +115,16 @@ export default {
               });
           }
 
-          console.log(this.active[i] + " " + i);
+          console.log(this.templates_active[i] + " " + i);
 
           // 配列の場合、setでないと再描画されない
-          this.$set(this.active, i, !this.active[i]);
-          console.log(this.active);
-          console.log(this.active[i] + " " + i);
+          this.$set(this.templates_active, i, !this.templates_active[i]);
+          console.log(this.templates_active);
+          console.log(this.templates_active[i] + " " + i);
         }
       }
     },
-    // テンプレート取得
-    async getTemplates() {
-      let data_templates = [];
-      let data_contents = [];
-      let active = [];
-      let name = [];
-      //let template_id = null;
-      const templates = await axios.get(this.api_url + "templates");
-      const contents = await axios.get(this.api_url + "contents");
 
-      await Promise.all(
-        templates.data.data.map((d) => {
-          console.log(d);
-          // ログイン中ユーザのテンプレートのみ表示
-          console.log(d.user_id + " " + this.$store.state.user.id);
-          if (d.user_id == this.$store.state.user.id) {
-            data_templates.push(d);
-            active.push(true);
-          }
-        })
-      );
-
-      await Promise.all(
-        contents.data.data.map((d) => {
-          console.log(d);
-          // ログイン中ユーザのテンプレートの中身のみ表示
-          console.log(d.user_id + " " + this.$store.state.user.id);
-          if (d.user_id == this.$store.state.user.id) {
-            data_contents.push(d);
-            active.push(true);
-          }
-        })
-      );
-      this.templates = data_templates;
-      this.contents = data_contents;
-      this.active = active;
-
-      await Promise.all(
-        contents.data.data.map((d) => {
-          console.log(d);
-          // ログイン中ユーザのテンプレートの中身のみ表示
-          console.log(d.template_id + " " + d.id);
-          console.log();
-          // console.log(
-          //   "テンプレート名:" + " " + this.findTemplate(d.template_id, d.id)
-          // );
-          name.push(this.findTemplate(d.template_id, d.id));
-          console.log(name);
-        })
-      );
-
-      this.name = name;
-
-      console.log(this.templates);
-      console.log(this.active);
-      console.log(this.name);
-    },
-    // テンプレート名検索
-    findTemplate(template_id, content_id) {
-      let name = null;
-
-      // templates配列の値を全てループで確認
-      // 最初に引っかかったテンプレートIDの名前を返す
-      console.log(this.templates.length);
-      this.templates.find((template) => {
-        if (template.id == template_id) {
-          console.log(template.name);
-
-          // テンプレート名が確定
-          console.log(name);
-
-          let cnt = 0;
-          this.contents.find((content) => {
-            if (content.template_id == template_id) {
-              console.log(
-                content.template_id + " " + content.id + " " + content_id
-              );
-              if (content.id == content_id && cnt == 0) {
-                cnt++;
-                console.log("一致" + content.id + " " + content_id);
-                name = template.name;
-                console.log(name);
-              } else {
-                cnt++;
-                console.log(
-                  "間違い" + content.id + " " + content_id + " " + cnt
-                );
-                if (name == null) {
-                  name = null;
-                }
-                console.log(name);
-              }
-            }
-
-            // return template.id == template_id;
-          });
-
-          //break;
-        }
-      });
-
-      return name;
-    },
     // テンプレート一行追加
     doAdd(index) {
       console.log("テンプレート更新：" + " " + this.contents[index]);
@@ -322,7 +222,6 @@ export default {
       console.log(this.$route.path);
       this.profile = true;
     }
-    this.getTemplates();
   },
   destroyed() {
     window.removeEventListener("beforeunload", this.handler);

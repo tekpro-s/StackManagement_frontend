@@ -47,6 +47,12 @@
 import axios from "axios";
 import moment from "moment";
 export default {
+  props: {
+    templates: Array,
+    templates_active: Array,
+    contents: Array,
+    templates_name: Array,
+  },
   data() {
     return {
       date: this.nowDate(),
@@ -116,6 +122,9 @@ export default {
 
           this.template_id = response.data.data_id;
 
+          this.templates.unshift(response.data.data);
+          this.templates_active.unshift(true);
+
           // this.$router.go({
           //   path: this.$router.currentRoute.path,
           //   force: true,
@@ -139,10 +148,10 @@ export default {
                 console.log(response);
                 console.log("template_response:" + response);
                 console.log("template_id:" + response.data.template_id);
-                this.$router.go({
-                  path: this.$router.currentRoute.path,
-                  force: true,
-                });
+                this.contents.unshift(response.data.data);
+                if (i == 0) {
+                  this.templates_name.unshift(response.data.data.title);
+                }
               });
           }
         });
